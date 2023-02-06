@@ -875,6 +875,7 @@ impl<'config, 'precompiles, S: StackState<'config>, P: PrecompileSet>
 		self.state.touch(context.address);
 
 		if let Some(depth) = self.state.metadata().depth {
+			println!("evm: depth: {:?}", depth);
 			if depth > self.config.call_stack_limit {
 				let _ = self.exit_substate(StackExitKind::Reverted);
 				return Capture::Exit((ExitError::CallTooDeep.into(), Vec::new()));
@@ -885,6 +886,7 @@ impl<'config, 'precompiles, S: StackState<'config>, P: PrecompileSet>
 			match self.state.transfer(transfer) {
 				Ok(()) => (),
 				Err(e) => {
+					println!("evm: match self.state.transfer(transfer): {:?}", e);
 					let _ = self.exit_substate(StackExitKind::Reverted);
 					return Capture::Exit((ExitReason::Error(e), Vec::new()));
 				}
@@ -934,7 +936,7 @@ impl<'config, 'precompiles, S: StackState<'config>, P: PrecompileSet>
 
 		let reason = self.execute(&mut runtime);
 		log::debug!(target: "evm", "Call execution using address {}: {:?}", code_address, reason);
-
+		println!("evm : Call execution using address {}: {:?}",code_address, reason);
 		match reason {
 			ExitReason::Succeed(s) => {
 				let _ = self.exit_substate(StackExitKind::Succeeded);
